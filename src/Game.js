@@ -22,6 +22,8 @@ export default class Game {
     this.currentQuestion = new Question("Hello dah");
 
     this.play();
+
+    this.eventHandlers();
   }
 
   draw(ctx){
@@ -34,6 +36,30 @@ export default class Game {
     this.currentQuestion.draw(this.ctx);
     requestAnimationFrame((timestamp) => {
         this.play();
+    });
+  }
+
+  eventHandlers(){
+    document.addEventListener('keydown', (event) => {
+      const code = event.keyCode;
+      switch(code){
+        case 65:
+        case 37:
+          this.player.move("left",this.ctx);
+          break;
+        case 68:
+        case 39:
+          this.player.move("right",this.ctx);
+          break;
+        case 87:
+        case 38:
+          this.player.move("up",this.ctx);
+          break;
+        case 83:
+        case 40:
+          this.player.move("down",this.ctx);
+          break;
+      }
     });
   }
 

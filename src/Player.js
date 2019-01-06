@@ -8,56 +8,58 @@ export default class Player {
     this.x=this.initialX;
     this.y=this.initialY;
     this.color="#000000";
-    this.speed=10;
-
-    this.eventHandlers();
+    this.speed=15;
   }
+
 
   draw(ctx){
     ctx.fillStyle = this.color;
     ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
-  move(direction){
-    switch(direction){
-      case "up":
-        this.y-=this.speed;
-        break;
-      case "down":
-        this.y+=this.speed;
-        break;
-      case "left":
-        this.x-=this.speed;
-        break;
-      case "right":
-        this.x+=this.speed;
-          break;
+  checkCollision(vertexes,ctx){
+    const bg = [255,255,255];
+    for(let v in vertexes){
+      let pixelData = ctx.getImageData(vertexes[v][0], vertexes[v][1], 1, 1).data;
+      for(let b in bg){
+        if(bg[b]!==pixelData[b]){
+          return true;
+        }
+      }
     }
-    console.log(this.x,this.y);
+    return false;
   }
 
-  eventHandlers(){
-    document.addEventListener('keydown', (event) => {
-      const code = event.keyCode;
-      console.log(event);
-      switch(code){
-        case 65:
-        case 37:
-          this.move("left");
-          break;
-        case 68:
-        case 39:
-          this.move("right");
-          break;
-        case 87:
-        case 38:
-          this.move("up");
-          break;
-        case 83:
-        case 40:
-          this.move("down");
-          break;
-      }
-    });
+  move(direction,ctx,speed=null){
+    if(speed == null){
+      speed=this.speed;
+    }
+    let newX=this.x,
+        newY=this.y;
+    let collision=true;
+    switch(direction){
+      case "up":
+        newY-=speed;
+        collision=this.checkCollision([[newX,newY],[newX+this.width,newY]],ctx);
+        break;
+      case "down":
+        newY+=speed;
+        collision=this.checkCollision([[newX,newY+this.height],[newX+this.width,newY+this.height]],ctx);
+        break;
+      case "left":
+        newX-=speed;
+        collision=this.checkCollision([[newX,newY],[newX,newY+this.height]],ctx);
+        break;
+      case "right":
+        newX+=speed;
+        collision=this.checkCollision([[newX+this.width,newY],[newX+this.width,newY+this.height]],ctx);
+        break;
+    }
+    if(collision===false){
+      this.x=newX;
+      this.y=newY;
+    } else if(speed>0) {
+      this.move(direction,ctx,speed-1);
+    }
   }
 }
