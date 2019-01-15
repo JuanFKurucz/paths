@@ -1,4 +1,7 @@
 'use strict';
+import Game from './Game.js';
+import Answer from './Answer.js';
+
 export default class Question {
   static TitleCoordinate(){}
   static AnswersCoordinates(){}
@@ -43,6 +46,13 @@ export default class Question {
         break;
       }
     }
+    if(answersLength<2){
+      const texts = ["Ir para atras","Volver al incio"];
+      for(let i=answersLength;i<2-answersLength;i++){
+        let cord = Question.AnswersCoordinates[i];
+        ctx.fillText(texts[i], cord.x, cord.y);
+      }
+    }
   }
 
   chooseAnswer(direction){
@@ -51,9 +61,13 @@ export default class Question {
       if(direction === 1){
         index = 1;
       }
+
       if(index>=0 && index<this.answers.length){
-        console.log(this.answers);
         return this.answers[index];
+      } else if(index>=this.answers.length){
+        const path = Game.getPath(),
+              jumps = [path.lastIndexOf(this.id),0];
+        return new Answer(this.id,jumps[index],"");
       }
     }
     return null;

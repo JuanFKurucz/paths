@@ -5,7 +5,12 @@ import Answer from './Answer.js';
 import Coordinate from './Coordinate.js';
 import Data from './Data.js';
 
+let gameObject = null;
+
 export default class Game {
+  static getPath(){
+    return gameObject.path;
+  }
   constructor(canvas,background){
     this.canvas = canvas;
     this.background = background;
@@ -26,10 +31,12 @@ export default class Game {
     this.questions={};
     this.player = new Player(new Coordinate(mid.x,mid.y));
 
+    this.path=[];
     this.loadGame();
 
     this.play();
     this.eventHandlers();
+    gameObject = this;
   }
 
   loadGame(){
@@ -62,6 +69,7 @@ export default class Game {
     let $debug = document.querySelector("#debuggGraph");
     this.currentQuestion = this.questions["0"];
     this.currentQuestion.visited=true;
+    this.path.push(this.currentQuestion);
     this.createTableTree($debug,this.currentQuestion);
   }
 
@@ -121,11 +129,18 @@ export default class Game {
         this.player.act(answer.action);
         this.currentQuestion=newQuestion;
         this.currentQuestion.visited=true;
+        if(newQuestion.id == "0"){
+          this.path=[];
+        } else {
+          this.path.push(this.currentQuestion);
+        }
         const tdAnswer = document.querySelector("#question-"+answer.source+"-answer-"+answer.position);
         console.log(tdAnswer);
         console.log("#question-"+answer.source+"-answer-"+answer.position);
         if(this.already.indexOf(answer.destination)===-1){
-          tdAnswer.appendChild(this.createTableTree(tdAnswer,this.currentQuestion));
+          if(tdAnswer && tdAnswer != null){
+            tdAnswer.appendChild(this.createTableTree(tdAnswer,this.currentQuestion));
+          }
         } else if(tdAnswer.getElementsByTagName("table").length===0 && tdAnswer.getElementsByTagName("i").length===0) {
           this.appendRedirect(tdAnswer,answer.destination);
         }
