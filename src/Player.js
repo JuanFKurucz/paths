@@ -1,20 +1,25 @@
 'use strict';
+import Coordinate from './Coordinate.js';
 export default class Player {
-  constructor(x,y){
+  constructor(cord){
     this.width=50;
     this.height=50;
-    this.initialX=parseInt(x-this.width/2);
-    this.initialY=parseInt(y-this.height/2);
-    this.x=this.initialX;
-    this.y=this.initialY;
+    this.initialCord = new Coordinate(parseInt(cord.x-this.width/2),parseInt(cord.y-this.height/2));
+    this.cord = new Coordinate(this.initialCord.x,this.initialCord.y);
     this.color="#000000";
     this.speed=15;
+    this.data={
+      "money":0,
+    }
   }
 
+  resetPosition(){
+    this.cord.copy(this.initialCord);
+  }
 
   draw(ctx){
     ctx.fillStyle = this.color;
-    ctx.fillRect(this.x, this.y, this.width, this.height);
+    ctx.fillRect(this.cord.x, this.cord.y, this.width, this.height);
   }
 
   checkCollision(vertexes,ctx){
@@ -30,12 +35,27 @@ export default class Player {
     return false;
   }
 
+  /*
+  * Returns 0 if not
+  * Returns 1 if it is right answer
+  * Returns -1 if it is left answer
+  */
+  inAnswerZone(){
+    if(this.cord.y>this.initialCord.y*2-this.width){
+      if(this.cord.x<=this.initialCord.x){
+        return -1;
+      }
+      return 1;
+    }
+    return 0;
+  }
+
   move(direction,ctx,speed=null){
     if(speed == null){
       speed=this.speed;
     }
-    let newX=this.x,
-        newY=this.y;
+    let newX=this.cord.x,
+        newY=this.cord.y;
     let collision=true;
     switch(direction){
       case "up":
@@ -56,10 +76,24 @@ export default class Player {
         break;
     }
     if(collision===false){
-      this.x=newX;
-      this.y=newY;
+      this.cord.x=newX;
+      this.cord.y=newY;
     } else if(speed>0) {
       this.move(direction,ctx,speed-1);
+    }
+  }
+
+  act(action){
+    if(action !== null){
+      for(let key in action){
+        if(!this.data.hasOwnProperty(key)){
+          this.data[key]=0;
+        }
+        this.data[key]+=parseInt(action[key]);
+        if(this.data[key]<0){
+          this.data[key]=0;
+        }
+      }
     }
   }
 }
