@@ -25,6 +25,27 @@ export default class Question {
     this.answers.push(answer);
   }
 
+  getRealAnswers(player){
+    const realAnswers=[],
+          answersLength = this.answers.length;
+    for(let i=0;i<answersLength;i++){
+      if(this.answers[i].canShow(player)){
+        realAnswers.push(this.answers[i]);
+      }
+    }
+    if(answersLength<2){
+      const texts = ["Ir para atras","Volver al incio"],
+            path = Game.getPath(),
+            jumps = [path.lastIndexOf(this.id),0];
+      let count=0;
+      for(let i=answersLength;i<2-answersLength;i++){
+        realAnswers.push(new Answer(this.id,jumps[count],texts[i]));
+        count++;
+      }
+    }
+    return realAnswers;
+  }
+
   draw(ctx,player){
     ctx.fillStyle = "#FFFFFF";
     ctx.font = "30px Arial";
@@ -34,40 +55,28 @@ export default class Question {
 
     ctx.fillStyle = "#000000";
     ctx.font = "21px Arial";
-    let answersLength = this.answers.length;
-    let realI=0;
+    let answers=this.getRealAnswers(player),
+        answersLength = answers.length;
+
     for(let i=0;i<answersLength;i++){
-      if(this.answers[i].canShow(player)){
-        let cord = Question.AnswersCoordinates[realI];
-        ctx.fillText(this.answers[i].getText(), cord.x, cord.y);
-        realI++;
-      }
-      if(realI===answersLength){
-        break;
-      }
-    }
-    if(answersLength<2){
-      const texts = ["Ir para atras","Volver al incio"];
-      for(let i=answersLength;i<2-answersLength;i++){
-        let cord = Question.AnswersCoordinates[i];
-        ctx.fillText(texts[i], cord.x, cord.y);
-      }
+      let cord = Question.AnswersCoordinates[i];
+      ctx.fillText(answers[i].getText(), cord.x, cord.y);
     }
   }
 
-  chooseAnswer(direction){
+  chooseAnswer(player){
+    const direction = player.inAnswerZone();
     if(direction!==0){
+      let answers=this.getRealAnswers(player),
+          answersLength = answers.length;
+      console.log(answers);
       let index = 0;
       if(direction === 1){
         index = 1;
       }
 
-      if(index>=0 && index<this.answers.length){
-        return this.answers[index];
-      } else if(index>=this.answers.length){
-        const path = Game.getPath(),
-              jumps = [path.lastIndexOf(this.id),0];
-        return new Answer(this.id,jumps[index],"");
+      if(index>=0 && index<answersLength){
+        return answers[index];
       }
     }
     return null;

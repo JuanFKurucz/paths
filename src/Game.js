@@ -121,7 +121,7 @@ export default class Game {
   }
 
   changeQuestion(){
-    const answer = this.currentQuestion.chooseAnswer(this.player.inAnswerZone());
+    const answer = this.currentQuestion.chooseAnswer(this.player);
     if(answer&&answer!==null){
       const newQuestion = this.questions[answer.getDestination()];
       if(newQuestion && newQuestion !== null){

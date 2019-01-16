@@ -58,7 +58,7 @@ export default
     {"id":"14","text":"Vender o comprar?","answers":[
       {"destination":"16","text":"Vender","condition":{"item":">0"}},
       {"destination":"19","text":"Comprar","condition":{"money":">4"}},
-      {"destination":"12","text":"Salir del almacen"}
+      {"destination":"13","text":"Salir del almacen"}
     ]},
     {"id":"16","text":"Vender manzana","answers":[
       {"destination":"17","text":"Si"},
